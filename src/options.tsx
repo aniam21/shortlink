@@ -25,8 +25,9 @@ import React, { useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 
 const Options = () => {
-  const [color, setColor] = useState<string>("")
   const [status, setStatus] = useState<string>("")
+  const [desiredWaterIntake, setDesiredWaterIntake] = useState<number>(9);
+  const [timeBetweenWater, setTimeBetweenWater] = useState<number>(30);
   const [like, setLike] = useState<boolean>(false)
 
   useEffect(() => {
@@ -34,22 +35,23 @@ const Options = () => {
     // stored in chrome.storage.
     chrome.storage.sync.get(
       {
-        favoriteColor: "red",
-        likesColor: true,
+        desiredWaterIntake: 9,
+        timeBetweenWaterIntake: 30,
       },
       (items) => {
-        setColor(items.favoriteColor)
-        setLike(items.likesColor)
+        setDesiredWaterIntake(items.desiredWaterIntake)
+        setTimeBetweenWater(items.timeBetweenWaterIntake)
       }
     )
+
   }, [])
 
-  const saveOptions = () => {
+  const saveWaterOptions = () => {
     // Saves options to chrome.storage.sync.
     chrome.storage.sync.set(
       {
-        favoriteColor: color,
-        likesColor: like,
+        desiredWaterIntake,
+        timeBetweenWaterIntake: timeBetweenWater,
       },
       () => {
         // Update status to let user know options were saved.
@@ -60,19 +62,29 @@ const Options = () => {
         return () => clearTimeout(id)
       }
     )
-  }
+  };
 
   return (
     <>
       <div>
-        Favorite color:{" "}
-        <select value={color} onChange={(event) => setColor(event.target.value)}>
-          <option value="red">red</option>
-          <option value="green">green</option>
-          <option value="blue">blue</option>
-          <option value="yellow">yellow</option>
+        Desired Water Intake:{" "}
+        <select value={desiredWaterIntake} onChange={(event) => setDesiredWaterIntake((+event.target.value) || 9)}>
+          <option value={8}>8</option>
+          <option value={9}>9</option>
+          <option value={10}>10</option>
+          <option value={11}>11</option>
         </select>
       </div>
+      <div>
+        Breaks:{" "}
+        <select value={timeBetweenWater} onChange={(event) => setTimeBetweenWater((+event.target.value) || 30)}>
+          <option value={30}>30 mins</option>
+          <option value={45}>45 mins</option>
+          <option value={60}>1 Hour :/</option>
+          <option value={75}>1 Hour and 15 Mins :///</option>
+        </select>
+      </div>
+
       <div>
         <label>
           <input
@@ -80,11 +92,11 @@ const Options = () => {
             checked={like}
             onChange={(event) => setLike(event.target.checked)}
           />
-          I like colors.
+          I like Water.
         </label>
       </div>
       <div>{status}</div>
-      <button onClick={saveOptions}>Save</button>
+      <button onClick={saveWaterOptions}>Save</button>
     </>
   )
 }
